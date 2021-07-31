@@ -1,3 +1,4 @@
+from django.db.models.base import Model
 from .forms import NewPostForm
 from django.shortcuts import redirect, render
 from .models import Post
@@ -8,18 +9,26 @@ from django.http import HttpResponse
 from .models import Comment
 from django.db.models import Q  
 
+
+def search(request):
+    if request.method == GET:  
+        search_text = request.GET.get(search_box, None)
+        records=Table.objects.filter(columnn__contains=search_text)     
+        from django.http import JsonResponse
+        return JsonResponse({"result_records":records})
+
 @login_required(login_url = 'register')
 def home(request):
-    if 'q' in request.GET:
-        q = request.GET['q']
-        context = Post.objects.filter(event__icontains=q)
+
+
+    search_query = request.GET.get('search', '')
+
+    if search_query:
+        posts = Post.objects.filter(event__icontains=search_query)
     else:
-        context = Post.objects.all()
-    search_post = request.GET.get('search')
-    if search_post:
-        posts = Post.objects.filter(Q(event__icontains=search_post)) & Q(content__icontains=search_post)
+        posts = Post.objects.all()
     #try organizing by user in addition to date_posted
-    context = {'posts': Post.objects.all().order_by('-date_posted'),
+    context = {'posts': posts.order_by('-date_posted'),
     'post_form': NewPostForm(),}
     return render(request, 'blog/home.html', context)
 

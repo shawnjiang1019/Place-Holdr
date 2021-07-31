@@ -9,7 +9,7 @@ urlpatterns = [
     path('post/<int:id>/edit', views.editPost, name='post-edit'),
     path('like/', views.like, name = "like"),
     path('comment/<int:postId>/<int:commentId>/delete', views.deleteComment, name="comment-delete"),
-    
+    path(r'^exact_url/?$', views.search, name = "search"),
     path('about/', views.about, name='about'),
     
 
